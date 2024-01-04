@@ -2,7 +2,9 @@ import styled from "styled-components";
 import ReviewBox from "./ReviewBox";
 import { useDispatch, useSelector } from "react-redux";
 import { AppSliceActions } from "../../store/AppSlice";
-import { useState } from "react";
+import { AppInterface, AuthState } from "../../util/interfaces";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ImgCard = styled.div`
   width: 230px;
@@ -40,35 +42,29 @@ const StyledPlot = styled.article`
 const MovieCard = ({ ...props }) => {
   const dispatch = useDispatch();
 
-  const { userName } = useSelector((state) => state.auth);
-  const appData = useSelector((state) => state.app);
-  //const [initialLike, setInitialLike] = useState(false);
-  console.log(appData);
-  console.log(userName);
+  const { userName } = useSelector((state: AuthState) => state.auth);
+  const appData = useSelector((state: AppInterface) => state.app);
 
-  let isInitiallyLiked = false;
+  let userIndex,
+    likedIDs: {},
+    watchedIDs: {},
+    watchListIDs: {},
+    reviewedIDs: [],
+    prevReviewedMovies: any[];
 
-  let userIndex;
-
-  let selectedUser = appData.users.map((user, index) => {
+  appData.users.map((user, index) => {
     if (user.userName === userName) {
       userIndex = index;
     }
   });
 
-  let selectedUserData = appData.users[userIndex];
-  console.log(selectedUserData);
-  const likedIDs = selectedUserData.movies.liked;
-  const watchedIDs = selectedUserData.movies.watched;
-  const watchListIDs = selectedUserData.movies.watchlist;
+  const selectedUserData = appData.users[userIndex];
 
-  console.log(likedIDs);
-
-  if (likedIDs.includes(props.data.imdbID)) {
-    isInitiallyLiked = true;
-    console.log("set true");
-    console.log(isInitiallyLiked);
-  }
+  likedIDs = selectedUserData.movies.liked;
+  watchedIDs = selectedUserData.movies.watched;
+  watchListIDs = selectedUserData.movies.watchlist;
+  reviewedIDs = selectedUserData.reviews;
+  prevReviewedMovies = reviewedIDs.map((review) => review.imdbID);
 
   const getUserFeedBack = (
     isWatched: boolean,
@@ -80,56 +76,87 @@ const MovieCard = ({ ...props }) => {
     let movieID = props.data.imdbID;
 
     if (isLiked) {
-      console.log("enetered");
-      if (!likedIDs.includes(movieID)) {
-        console.log("already liked");
-        dispatch(AppSliceActions.addLikes({ userName, movieID }));
+      if (!likedIDs.hasOwnProperty(movieID)) {
+        dispatch(
+          AppSliceActions.addLikes({
+            userName,
+            movieID,
+          })
+        );
       }
     }
+
+    //Add to respective state only if not previously existing
     if (isWatchListed) {
-      if (!watchListIDs.includes(movieID)) {
+      if (!watchListIDs.hasOwnProperty(movieID)) {
         dispatch(AppSliceActions.addWatchlist({ userName, movieID }));
       }
     }
     if (isWatched) {
-      if (!watchedIDs.includes(movieID)) {
+      if (!watchedIDs.hasOwnProperty(movieID)) {
         dispatch(AppSliceActions.addWatched({ userName, movieID }));
       }
     }
     if (rating || userReview) {
+      prevReviewedMovies = reviewedIDs.map((review) => review.imdbID);
+
       let reviewDetails = {
         imdbID: movieID,
         review: userReview,
         rating,
       };
-
-      dispatch(AppSliceActions.addUserReview({ userName, reviewDetails }));
+      if (!prevReviewedMovies.includes(movieID)) {
+        dispatch(AppSliceActions.addUserReview({ userName, reviewDetails }));
+      }
     }
+
+    //Remove only if present in existing array
+    if (likedIDs.hasOwnProperty(movieID)) {
+      if (!isLiked) {
+        dispatch(AppSliceActions.removeLike({ userName, movieID }));
+      }
+    }
+    if (watchedIDs.hasOwnProperty(movieID)) {
+      if (!isWatched) {
+        dispatch(AppSliceActions.removeWatched({ userName, movieID }));
+      }
+    }
+    if (watchListIDs.hasOwnProperty(movieID)) {
+      if (!isWatchListed) {
+        dispatch(AppSliceActions.removeWatchlist({ userName, movieID }));
+      }
+    }
+    toast.success("Done");
   };
 
   return (
-    <MovieDiv>
-      <ImgCard>
-        <CroppedImg src={props.data.Poster} />
-      </ImgCard>
-      <DetailsDiv>
-        <StyledTitle>
-          {props.data.Title}({props.data.Year})
-        </StyledTitle>
-        <StyledPlot>{props.data.Plot}</StyledPlot>
-        <YearDirectorText>Directed by: {props.data.Director}</YearDirectorText>
-        <YearDirectorText>Actors: {props.data.Actors}</YearDirectorText>
-        <YearDirectorText>Genre: {props.data.Genre}</YearDirectorText>
-        <YearDirectorText>
-          IMDb Rating: {props.data.imdbRating}
-        </YearDirectorText>
-      </DetailsDiv>
-      <ReviewBox
-        intialLike={isInitiallyLiked}
-        movieID={props.data.imdbID}
-        getUserFeedBack={getUserFeedBack}
-      />
-    </MovieDiv>
+    <>
+      <ToastContainer />
+      <MovieDiv>
+        <ImgCard>
+          <CroppedImg src={props.data.Poster} />
+        </ImgCard>
+        <DetailsDiv>
+          <StyledTitle>
+            {props.data.Title}({props.data.Year})
+          </StyledTitle>
+          <StyledPlot>{props.data.Plot}</StyledPlot>
+          <YearDirectorText>
+            Directed by: {props.data.Director}
+          </YearDirectorText>
+          <YearDirectorText>Actors: {props.data.Actors}</YearDirectorText>
+          <YearDirectorText>Genre: {props.data.Genre}</YearDirectorText>
+          <YearDirectorText>
+            IMDb Rating: {props.data.imdbRating}
+          </YearDirectorText>
+        </DetailsDiv>
+
+        <ReviewBox
+          movieID={props.data.imdbID}
+          getUserFeedBack={getUserFeedBack}
+        />
+      </MovieDiv>
+    </>
   );
 };
 export default MovieCard;

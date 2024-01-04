@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
 import fetch from "../../API/fetch";
 import MovieCard from "./MovieCard";
+//import { UserMsgP } from "../SignUp/SignUp";
 
 export const BodyDiv = styled.div`
   width: 100%;
@@ -39,11 +40,16 @@ const FindLabel = styled.label`
   font-weight: 400;
 `;
 
+const UserMsgP = styled.p`
+  text-align: center;
+  font-size: 1rem;
+`;
+
 const UserHome = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [enabled, setEnabled] = useState(false);
 
-  const { status, error, data } = useQuery({
+  const { status, isFetching, error, data } = useQuery({
     queryKey: ["movie", searchTerm],
     queryFn: () =>
       fetch(`http://www.omdbapi.com/?t=${searchTerm}&apikey=3f046e12`),
@@ -52,8 +58,11 @@ const UserHome = () => {
 
   if (status === "error") return <p>Error {error.message}</p>;
 
-  console.log({ data, status, error });
+  console.log(data);
 
+  if (isFetching) {
+    return <UserMsgP>Fetching...</UserMsgP>;
+  }
   const searchTermChangeHandler = (
     event: React.FormEvent<HTMLInputElement>
   ) => {
@@ -64,6 +73,8 @@ const UserHome = () => {
   const searchHandler = () => {
     setEnabled(true);
   };
+  console.log(data);
+
   return (
     <ContentDiv>
       <SearchSection>

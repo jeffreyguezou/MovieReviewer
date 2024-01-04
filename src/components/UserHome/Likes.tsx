@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import fetch from "../../API/fetch";
 import { ContentDiv, CardContentHolder } from "./WatchList";
 import { useSelector } from "react-redux";
+import { AppInterface, AuthState } from "../../util/interfaces";
 
 const Border = styled.div`
   height: 10px;
@@ -19,33 +20,36 @@ const WatchListText = styled.span`
 //const IDs = ["tt0054215", "tt0068646", "tt1392170"];
 
 const Likes = () => {
-  const appData = useSelector((state) => state.app);
-  const { userName } = useSelector((state) => state.auth);
+  const appData = useSelector((state: AppInterface) => state.app);
+  const { userName } = useSelector((state: AuthState) => state.auth);
 
   let userIndex;
-  console.log(appData.users);
 
-  let selectedUser = appData.users.map((user, index) => {
+  appData.users.map((user, index) => {
     if (user.userName === userName) {
       userIndex = index;
     }
   });
 
-  let selectedUserData = appData.users[userIndex];
-  console.log(selectedUserData);
+  const selectedUserData = appData.users[userIndex];
+
   const IDs = selectedUserData.movies.liked;
   return (
     <ContentDiv>
-      <WatchListText>You liked {IDs.length} movies</WatchListText>
+      <WatchListText>You liked {Object.keys(IDs).length} movies</WatchListText>
       <Border></Border>
       <CardContentHolder>
-        {IDs.map((id) => {
-          const { status, error, data } = useQuery({
+        {Object.keys(IDs).map((id) => {
+          const { isFetching, data } = useQuery({
             queryKey: ["movie", id],
             queryFn: () => {
               return fetch(`http://www.omdbapi.com/?i=${id}&apikey=3f046e12`);
             },
           });
+
+          if (isFetching) {
+            return <p key={id}>Fetching...</p>;
+          }
 
           return (
             <MovieCard key={id}>

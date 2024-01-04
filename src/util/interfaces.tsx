@@ -1,22 +1,31 @@
 interface movies {
-  watched: string[];
-  liked: string[];
-  watchlist: string[];
+  watched: {};
+  liked: {};
+  watchlist: {};
 }
-interface review {
+export interface review {
   imdbID: string;
   review: string;
   rating: number;
 }
-interface userInterface {
-  users: {
-    userName: string;
-    password: string;
-    email: string;
-    movies: movies;
-    reviews: review[];
+export interface userInterface {
+  userName: string;
+  password: string;
+  email: string;
+  movies: movies;
+  reviews: review[];
+}
+export interface AppInterface {
+  app: {
+    users: userInterface[];
   };
 }
 export interface userArray {
   users: userInterface[];
+}
+export interface AuthState {
+  auth: {
+    isLoggedIn: boolean;
+    userName: string;
+  };
 }

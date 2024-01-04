@@ -2,9 +2,10 @@ import { useSelector } from "react-redux";
 import { LoadingP } from "./WatchList";
 import { useQuery } from "@tanstack/react-query";
 import fetch from "../../API/fetch";
-import { MoviePoster, MovieTitle, MovieCard } from "./Watched";
+import { MoviePoster, MovieTitle, MovieCard, NoMovieMsg } from "./Watched";
 import { FaRegStar } from "react-icons/fa";
 import styled from "styled-components";
+import { AppInterface, AuthState } from "../../util/interfaces";
 
 const ContentBodyDiv = styled.div`
   padding: 1rem;
@@ -21,10 +22,19 @@ const ReviewDiv = styled.div`
   align-items: center;
   color: #def;
 `;
+const ReviewRow = styled.div`
+  width: 33%;
+  text-align: center;
+  flex-wrap: wrap;
+`;
+
+const AlignedMovieCard = styled(MovieCard)`
+  align-items: center;
+`;
 
 const Reviews = () => {
-  const userData = useSelector((state) => state.app.users);
-  const { userName } = useSelector((state) => state.auth);
+  const userData = useSelector((state: AppInterface) => state.app.users);
+  const { userName } = useSelector((state: AuthState) => state.auth);
   let userIndex;
 
   let selectedUser = userData.map((user, index) => {
@@ -32,9 +42,12 @@ const Reviews = () => {
       userIndex = index;
     }
   });
-  console.log(userIndex);
-  console.log(userData[userIndex].reviews);
+
   let reviewData = userData[userIndex].reviews;
+
+  if (reviewData.length === 0) {
+    return <NoMovieMsg>No movies reviewed yet!</NoMovieMsg>;
+  }
 
   return (
     <>
@@ -52,19 +65,21 @@ const Reviews = () => {
             if (isFetching) {
               return <LoadingP>Fetching...</LoadingP>;
             }
-            console.log(reviewData);
+
             return (
               <ReviewDiv key={id}>
-                <MovieCard>
-                  {data && <MoviePoster src={data.Poster} />}
-                  {data && (
-                    <MovieTitle>
-                      {data.Title} ({data.Year})
-                    </MovieTitle>
-                  )}
-                </MovieCard>
+                <ReviewRow>
+                  <AlignedMovieCard>
+                    {data && <MoviePoster src={data.Poster} />}
+                    {data && (
+                      <MovieTitle>
+                        {data.Title} ({data.Year})
+                      </MovieTitle>
+                    )}
+                  </AlignedMovieCard>
+                </ReviewRow>
 
-                <div>
+                <ReviewRow>
                   {reviewData.map((rev) => {
                     if (rev.imdbID === id) {
                       return (
@@ -76,14 +91,14 @@ const Reviews = () => {
                       );
                     }
                   })}
-                </div>
-                <div>
+                </ReviewRow>
+                <ReviewRow>
                   {reviewData.map((rev) => {
                     if (rev.imdbID === id) {
                       return rev.review;
                     }
                   })}
-                </div>
+                </ReviewRow>
               </ReviewDiv>
             );
           })}

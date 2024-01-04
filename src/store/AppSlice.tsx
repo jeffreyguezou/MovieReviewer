@@ -1,6 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { userArray, userInterface } from "../util/interfaces";
-
 const initialState = {
   users: [
     {
@@ -8,9 +6,9 @@ const initialState = {
       password: "123",
       email: "jeffrey@mail.com",
       movies: {
-        watched: [],
-        liked: [],
-        watchlist: [],
+        watched: {},
+        liked: {},
+        watchlist: {},
       },
       reviews: [
         {
@@ -32,23 +30,61 @@ const AppSlice = createSlice({
     },
     addLikes: (state, action) => {
       let userIndex;
-      let datad = state.users.map((user, index) => {
+      state.users.map((user, index) => {
         if (user.userName === action.payload.userName) {
           userIndex = index;
-          console.log(userIndex);
         }
       });
-      state.users[userIndex].movies.liked.push(action.payload.movieID);
+      if (userIndex) {
+        let movieID = action.payload.movieID;
+
+        let updatedLikes = {
+          ...state.users[userIndex].movies.liked,
+          [movieID]: { isLiked: true },
+        };
+        state.users[userIndex].movies.liked = updatedLikes;
+      }
+    },
+    removeLike: (state, action) => {
+      let userIndex;
+      state.users.map((user, index) => {
+        if (user.userName === action.payload.userName) {
+          userIndex = index;
+        }
+      });
+      let movieID = action.payload.movieID;
+      if (userIndex) {
+        delete state.users[userIndex].movies.liked[movieID];
+      }
     },
     addWatched: (state, action) => {
-      let userIndex: number;
-      let datad = state.users.map((user, index) => {
+      let userIndex;
+      state.users.map((user, index) => {
         if (user.userName === action.payload.userName) {
           userIndex = index;
         }
       });
-      state.users[userIndex].movies.watched.push(action.payload.movieID);
+      if (userIndex) {
+        let movieID = action.payload.movieID;
+        let updatedWatched = {
+          ...state.users[userIndex].movies.watched,
+          [movieID]: { isWatched: true },
+        };
+        state.users[userIndex].movies.watched = updatedWatched;
+      }
     },
+    removeWatched: (state, action) => {
+      let userIndex;
+      state.users.map((user, index) => {
+        if (user.userName === action.payload.userName) {
+          userIndex = index;
+        }
+      });
+      let movieID = action.payload.movieID;
+
+      delete state.users[userIndex].movies.watched[movieID];
+    },
+
     addWatchlist: (state, action) => {
       let userIndex;
       state.users.map((user, index) => {
@@ -56,8 +92,27 @@ const AppSlice = createSlice({
           userIndex = index;
         }
       });
-      state.users[userIndex].movies.watchlist.push(action.payload.movieID);
+      if (userIndex) {
+        let movieID = action.payload.movieID;
+        let updatedWatchList = {
+          ...state.users[userIndex].movies.watchlist,
+          [movieID]: { isWatchListed: true },
+        };
+        state.users[userIndex].movies.watchlist = updatedWatchList;
+      }
     },
+
+    removeWatchlist: (state, action) => {
+      let userIndex;
+      state.users.map((user, index) => {
+        if (user.userName === action.payload.userName) {
+          userIndex = index;
+        }
+      });
+      let movieID = action.payload.movieID;
+      delete state.users[userIndex].movies.watched[movieID];
+    },
+
     addUserReview: (state, action) => {
       let userIndex;
       state.users.map((user, index) => {
@@ -65,7 +120,9 @@ const AppSlice = createSlice({
           userIndex = index;
         }
       });
-      state.users[userIndex].reviews.push(action.payload.reviewDetails);
+      if (userIndex) {
+        state.users[userIndex].reviews.push(action.payload.reviewDetails);
+      }
     },
   },
 });

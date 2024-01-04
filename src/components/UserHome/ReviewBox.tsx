@@ -2,10 +2,11 @@ import styled from "styled-components";
 import { LuEye, LuHeart } from "react-icons/lu";
 import { MdOutlinePlaylistAdd } from "react-icons/md";
 import { FaRegStar } from "react-icons/fa";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SignUpBtn } from "../SignUp/SignUp";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router";
+import { AppInterface, AuthState } from "../../util/interfaces";
+import { review } from "../../util/interfaces";
 
 const ReviewAside = styled.aside`
   float: right;
@@ -59,44 +60,71 @@ const StyledTextArea = styled.textarea`
 const ReviewBox = ({ ...props }) => {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
-  const [isWatched, setIsWatched] = useState();
-  const [isLiked, setIsLiked] = useState();
-  const [isWatchListed, setIsWatchListed] = useState();
-  const [liked, setLiked] = useState(false);
+  const [isWatched, setIsWatched] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [isWatchListed, setIsWatchListed] = useState(false);
   const [userReview, setUserReview] = useState("");
-  const navigate = useNavigate();
+  const [isAlreadyReviewed, setIsAlreadyReviewed] = useState(false);
 
-  let initialLike;
+  const appData = useSelector((state: AppInterface) => state.app);
+  const { userName } = useSelector((state: AuthState) => state.auth);
+  let userIndex,
+    selectedUserData,
+    likedIDs: {},
+    watchedIDs: {},
+    watchListIDs: {},
+    reviewedIDs: review[],
+    prevReviewedMovies: string[];
 
-  const appData = useSelector((state) => state.app);
-  const { userName } = useSelector((state) => state.auth);
-  let userIndex;
-
-  let selectedUser = appData.users.map((user, index) => {
+  appData.users.map((user, index) => {
     if (user.userName === userName) {
       userIndex = index;
     }
   });
-  console.log(appData);
-  let selectedUserData = appData.users[userIndex];
-  console.log(selectedUserData);
-  const likedIDs = selectedUserData.movies.liked;
-  const watchedIDs = selectedUserData.movies.watched;
-  const watchListIDs = selectedUserData.movies.watchlist;
 
-  console.log(props);
-  console.log(props.intialLike);
-
-  if (likedIDs.includes(props.movieID)) {
-    console.log("liked");
-  }
-  if (watchListIDs.includes(props.movieID)) {
-    console.log("watch listed");
-  }
-  if (watchedIDs.includes(props.movieID)) {
-    console.log("watched");
+  if (userIndex) {
+    selectedUserData = appData.users[userIndex];
   }
 
+  if (selectedUserData) {
+    likedIDs = selectedUserData.movies.liked;
+    watchedIDs = selectedUserData.movies.watched;
+    watchListIDs = selectedUserData.movies.watchlist;
+    reviewedIDs = selectedUserData.reviews;
+
+    prevReviewedMovies = reviewedIDs.map((review) => review.imdbID);
+
+    useEffect(() => {
+      if (likedIDs.hasOwnProperty(props.movieID)) {
+        setIsLiked(true);
+      }
+      if (watchListIDs.hasOwnProperty(props.movieID)) {
+        console.log("watch listed");
+        setIsWatchListed(true);
+      }
+      if (watchedIDs.hasOwnProperty(props.movieID)) {
+        console.log("watched");
+        setIsWatched(true);
+      }
+
+      if (prevReviewedMovies.includes(props.movieID)) {
+        reviewedIDs.map((review, index) => {
+          if (review.imdbID === props.movieID) {
+            setUserReview(review.review);
+            setRating(review.rating);
+            setIsAlreadyReviewed(true);
+          }
+        });
+      }
+    }, [
+      props.movieID,
+      likedIDs,
+      watchListIDs,
+      watchedIDs,
+      prevReviewedMovies,
+      reviewedIDs,
+    ]);
+  }
   let watchText = isWatched ? "Watched" : "Watch";
   let likeText = isLiked ? "Liked" : "Like";
   let watchListText = isWatchListed ? "Added" : "Watchlist";
@@ -111,11 +139,16 @@ const ReviewBox = ({ ...props }) => {
     );
   };
 
-  const reviewChangeHandler = (event: React.FormEvent<HTMLInputElement>) => {
+  const reviewChangeHandler = (event: React.FormEvent<HTMLTextAreaElement>) => {
     setUserReview(event.currentTarget.value);
   };
 
   const style = { fontSize: "1.5rem" };
+
+  const disableStar = isAlreadyReviewed
+    ? { cursor: "not-allowed", pointerEvents: "none" }
+    : {};
+
   return (
     <ReviewAside>
       <ReviewBoxDiv>
@@ -133,7 +166,6 @@ const ReviewBox = ({ ...props }) => {
             style={style}
             onClick={() => setIsLiked(!isLiked)}
           />
-          {props.initalLike && <LuHeart color={"red"}></LuHeart>}
 
           <label>{likeText}</label>
         </ActionDiv>
@@ -148,7 +180,7 @@ const ReviewBox = ({ ...props }) => {
       </ReviewBoxDiv>
       <InputDiv>
         <label>Rating</label>
-        <StarDiv>
+        <StarDiv style={disableStar}>
           {[...Array(5)].map((star, index) => {
             const currentRating = index + 1;
             return (
@@ -182,6 +214,7 @@ const ReviewBox = ({ ...props }) => {
         <StyledTextArea
           value={userReview}
           onChange={reviewChangeHandler}
+          disabled={isAlreadyReviewed}
         ></StyledTextArea>
       </InputDiv>
       <BtnDiv>

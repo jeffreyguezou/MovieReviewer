@@ -1,10 +1,9 @@
 #root {
-  height: 100%;
   width: 100vw;
   background-color: #15191d;
-
-  overflow: hidden;
+  overflow: auto;
 }
 body {
   margin: 0;
+  color: #def;
 }

@@ -3,6 +3,8 @@ import styled from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { authActions } from "../../store/AuthSlice";
+import { AuthState } from "../../util/interfaces";
+import { SignUpBtn } from "../SignUp/SignUp";
 
 const StyledNav = styled.nav`
   background-image: linear-gradient(
@@ -53,8 +55,12 @@ const PaddedDiv = styled.div`
   font-weight: bold;
 `;
 
+const LogOutBtn = styled(SignUpBtn)`
+  margin: -1rem 1rem;
+`;
+
 const NavBar = () => {
-  const { isLoggedIn } = useSelector((state) => state.auth);
+  const { isLoggedIn } = useSelector((state: AuthState) => state.auth);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -77,7 +83,7 @@ const NavBar = () => {
           )}
           {isLoggedIn && (
             <StyledUl>
-              <button onClick={logoutHandler}>Log Out</button>
+              <LogOutBtn onClick={logoutHandler}>Log Out</LogOutBtn>
             </StyledUl>
           )}
         </PaddedDiv>
