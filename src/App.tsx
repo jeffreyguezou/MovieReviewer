@@ -19,6 +19,7 @@ function App() {
     {
       path: "/",
       element: <RootLayout />,
+
       children: [
         {
           path: "",
@@ -27,6 +28,7 @@ function App() {
         {
           path: "/home",
           element: <UserRoot />,
+          errorElement: <LandingPage />,
           children: [
             {
               path: "",

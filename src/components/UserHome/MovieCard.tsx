@@ -5,6 +5,7 @@ import { AppSliceActions } from "../../store/AppSlice";
 import { AppInterface, AuthState } from "../../util/interfaces";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { NoMovieMsg } from "./Watched";
 
 const ImgCard = styled.div`
   width: 230px;
@@ -51,6 +52,7 @@ const MovieCard = ({ ...props }) => {
     watchListIDs: {},
     reviewedIDs: [],
     prevReviewedMovies: any[];
+  let content;
 
   appData.users.map((user, index) => {
     if (user.userName === userName) {
@@ -129,9 +131,12 @@ const MovieCard = ({ ...props }) => {
     toast.success("Done");
   };
 
-  return (
-    <>
-      <ToastContainer />
+  console.log(props.data);
+
+  if (props.data.Response === "False") {
+    content = <NoMovieMsg>No movie found!</NoMovieMsg>;
+  } else {
+    content = (
       <MovieDiv>
         <ImgCard>
           <CroppedImg src={props.data.Poster} />
@@ -156,6 +161,13 @@ const MovieCard = ({ ...props }) => {
           getUserFeedBack={getUserFeedBack}
         />
       </MovieDiv>
+    );
+  }
+
+  return (
+    <>
+      <ToastContainer />
+      {content}
     </>
   );
 };

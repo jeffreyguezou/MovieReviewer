@@ -23,7 +23,7 @@ const ReviewDiv = styled.div`
   color: #def;
 `;
 const ReviewRow = styled.div`
-  width: 33%;
+  width: 25%;
   text-align: center;
   flex-wrap: wrap;
 `;
@@ -54,16 +54,19 @@ const Reviews = () => {
       <ContentBodyDiv>
         <PaddedDiv>
           {reviewData.map((review) => {
-            console.log(review);
             let id = review.imdbID;
-            const { isFetching, error, data } = useQuery({
+            const { isFetching, isError, data } = useQuery({
               queryKey: ["review", id],
               queryFn: () => {
                 return fetch(`http://www.omdbapi.com/?i=${id}&apikey=3f046e12`);
               },
+              staleTime: 5000,
             });
             if (isFetching) {
-              return <LoadingP>Fetching...</LoadingP>;
+              return <LoadingP key={id}>Fetching...</LoadingP>;
+            }
+            if (isError) {
+              return <LoadingP key={id}>Uh-Oh! Something went wrong!</LoadingP>;
             }
 
             return (
@@ -98,6 +101,10 @@ const Reviews = () => {
                       return rev.review;
                     }
                   })}
+                </ReviewRow>
+
+                <ReviewRow>
+                  <button>Delete</button>
                 </ReviewRow>
               </ReviewDiv>
             );

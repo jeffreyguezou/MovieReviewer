@@ -59,6 +59,7 @@ const WatchList = () => {
             queryFn: () => {
               return fetch(`http://www.omdbapi.com/?i=${id}&apikey=3f046e12`);
             },
+            staleTime: 5000,
           });
           if (isFetching) {
             return <LoadingP key={id}>Fetching...</LoadingP>;
