@@ -93,7 +93,7 @@ const Reviews = () => {
                       {reviewData.map((rev: review) => {
                         if (rev.imdbID === id) {
                           return (
-                            <div>
+                            <div key={rev.imdbID}>
                               {[...Array(rev.rating)].map((star, index) => {
                                 return <FaRegStar key={index} color={"gold"} />;
                               })}
