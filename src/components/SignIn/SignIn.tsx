@@ -77,7 +77,7 @@ const SignIn = () => {
           onChange={userNameChangeHandler}
           value={enteredUserName}
           type="text"
-          valid={!userNameEmpty}
+          valid={+!userNameEmpty}
         />
       </InputDiv>
       <InputDiv>
@@ -86,7 +86,7 @@ const SignIn = () => {
           value={enteredPassword}
           onChange={passwordChangeHandler}
           type="password"
-          valid={!passwordInvalid}
+          valid={+!passwordInvalid}
         />
       </InputDiv>
       <SignUpBtn onClick={signinHandler}>Sign In</SignUpBtn>

@@ -73,7 +73,7 @@ export const StyledInput = styled.input<Custom>`
   background-color: ${(props) => (props.valid ? "white" : "#f9dee3")};
 `;
 type Custom = {
-  valid: boolean;
+  valid: number;
 };
 
 const SignUp = () => {
@@ -150,7 +150,7 @@ const SignUp = () => {
           value={enteredMail}
           onChange={mailChangeHandler}
           type="email"
-          valid={!mailEmpty}
+          valid={+!mailEmpty}
         />
         {mailEmpty && <ValidationMsg>Required</ValidationMsg>}
       </InputDiv>
@@ -160,7 +160,7 @@ const SignUp = () => {
           value={enteredUserName}
           onChange={userNameChangeHandler}
           type="text"
-          valid={!userNameEmpty}
+          valid={+!userNameEmpty}
         />
         {userNameEmpty && <ValidationMsg>Required</ValidationMsg>}
       </InputDiv>
@@ -170,7 +170,7 @@ const SignUp = () => {
           value={enteredPassword}
           onChange={passwordChangeHandler}
           type="password"
-          valid={!passwordEmpty}
+          valid={+!passwordEmpty}
         />
         {passwordEmpty && <ValidationMsg>Required</ValidationMsg>}
       </InputDiv>

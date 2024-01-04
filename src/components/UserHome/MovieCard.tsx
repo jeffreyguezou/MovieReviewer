@@ -6,6 +6,7 @@ import { AppInterface, AuthState } from "../../util/interfaces";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { NoMovieMsg } from "./Watched";
+import { review } from "../../util/interfaces";
 
 const ImgCard = styled.div`
   width: 230px;
@@ -50,7 +51,7 @@ const MovieCard = ({ ...props }) => {
     likedIDs: {},
     watchedIDs: {},
     watchListIDs: {},
-    reviewedIDs: [],
+    reviewedIDs: review[],
     prevReviewedMovies: any[];
   let content;
 
@@ -59,14 +60,15 @@ const MovieCard = ({ ...props }) => {
       userIndex = index;
     }
   });
+  if (userIndex) {
+    const selectedUserData = appData.users[userIndex];
 
-  const selectedUserData = appData.users[userIndex];
-
-  likedIDs = selectedUserData.movies.liked;
-  watchedIDs = selectedUserData.movies.watched;
-  watchListIDs = selectedUserData.movies.watchlist;
-  reviewedIDs = selectedUserData.reviews;
-  prevReviewedMovies = reviewedIDs.map((review) => review.imdbID);
+    likedIDs = selectedUserData.movies.liked;
+    watchedIDs = selectedUserData.movies.watched;
+    watchListIDs = selectedUserData.movies.watchlist;
+    reviewedIDs = selectedUserData.reviews;
+    prevReviewedMovies = reviewedIDs.map((review: review) => review.imdbID);
+  }
 
   const getUserFeedBack = (
     isWatched: boolean,
@@ -100,7 +102,7 @@ const MovieCard = ({ ...props }) => {
       }
     }
     if (rating || userReview) {
-      prevReviewedMovies = reviewedIDs.map((review) => review.imdbID);
+      prevReviewedMovies = reviewedIDs.map((review: review) => review.imdbID);
 
       let reviewDetails = {
         imdbID: movieID,
@@ -110,7 +112,7 @@ const MovieCard = ({ ...props }) => {
       if (!prevReviewedMovies.includes(movieID)) {
         dispatch(AppSliceActions.addUserReview({ userName, reviewDetails }));
       } else {
-        reviewedIDs = reviewedIDs.filter((rev) => {
+        reviewedIDs = reviewedIDs.filter((rev: review) => {
           return rev.imdbID !== movieID;
         });
         reviewedIDs.push(reviewDetails);

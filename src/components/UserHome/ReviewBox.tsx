@@ -64,7 +64,6 @@ const ReviewBox = ({ ...props }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [isWatchListed, setIsWatchListed] = useState(false);
   const [userReview, setUserReview] = useState("");
-  const [isAlreadyReviewed, setIsAlreadyReviewed] = useState(false);
 
   const appData = useSelector((state: AppInterface) => state.app);
   const { userName } = useSelector((state: AuthState) => state.auth);
@@ -98,20 +97,17 @@ const ReviewBox = ({ ...props }) => {
         setIsLiked(true);
       }
       if (watchListIDs.hasOwnProperty(props.movieID)) {
-        console.log("watch listed");
         setIsWatchListed(true);
       }
       if (watchedIDs.hasOwnProperty(props.movieID)) {
-        console.log("watched");
         setIsWatched(true);
       }
 
       if (prevReviewedMovies.includes(props.movieID)) {
-        reviewedIDs.map((review, index) => {
+        reviewedIDs.map((review) => {
           if (review.imdbID === props.movieID) {
             setUserReview(review.review);
             setRating(review.rating);
-            setIsAlreadyReviewed(true);
           }
         });
       }
@@ -183,6 +179,7 @@ const ReviewBox = ({ ...props }) => {
                   onClick={() => setRating(currentRating)}
                 />
                 <FaRegStar
+                  key={currentRating}
                   color={
                     currentRating <= (hover || rating) ? "#ffc107" : "e4e5e9"
                   }

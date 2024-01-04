@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { AuthState } from "../../util/interfaces";
 
 const StyledNav = styled.nav`
   display: flex;
@@ -40,7 +41,7 @@ const UserNavDiv = styled.div`
 `;
 const UserNav = () => {
   const navigate = useNavigate();
-  const { userName } = useSelector((state) => state.auth);
+  const { userName } = useSelector((state: AuthState) => state.auth);
 
   const navigateHomeHandler = () => {
     navigate("/home");
