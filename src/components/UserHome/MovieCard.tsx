@@ -109,6 +109,17 @@ const MovieCard = ({ ...props }) => {
       };
       if (!prevReviewedMovies.includes(movieID)) {
         dispatch(AppSliceActions.addUserReview({ userName, reviewDetails }));
+      } else {
+        reviewedIDs = reviewedIDs.filter((rev) => {
+          return rev.imdbID !== movieID;
+        });
+        reviewedIDs.push(reviewDetails);
+        dispatch(
+          AppSliceActions.replaceUserReview({
+            userName,
+            allUserReviews: reviewedIDs,
+          })
+        );
       }
     }
 
@@ -130,8 +141,6 @@ const MovieCard = ({ ...props }) => {
     }
     toast.success("Done");
   };
-
-  console.log(props.data);
 
   if (props.data.Response === "False") {
     content = <NoMovieMsg>No movie found!</NoMovieMsg>;

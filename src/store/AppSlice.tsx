@@ -124,6 +124,17 @@ const AppSlice = createSlice({
         state.users[userIndex].reviews.push(action.payload.reviewDetails);
       }
     },
+    replaceUserReview: (state, action) => {
+      let userIndex;
+      state.users.map((user, index) => {
+        if (user.userName === action.payload.userName) {
+          userIndex = index;
+        }
+      });
+      if (userIndex) {
+        state.users[userIndex].reviews = action.payload.allUserReviews;
+      }
+    },
   },
 });
 export default AppSlice.reducer;

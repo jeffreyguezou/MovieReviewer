@@ -58,8 +58,6 @@ const UserHome = () => {
 
   if (status === "error") return <p>Error {error.message}</p>;
 
-  console.log(data);
-
   if (isFetching) {
     return <UserMsgP>Fetching...</UserMsgP>;
   }
@@ -73,7 +71,6 @@ const UserHome = () => {
   const searchHandler = () => {
     setEnabled(true);
   };
-  console.log(data);
 
   return (
     <ContentDiv>

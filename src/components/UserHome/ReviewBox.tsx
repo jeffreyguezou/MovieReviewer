@@ -92,9 +92,8 @@ const ReviewBox = ({ ...props }) => {
     watchListIDs = selectedUserData.movies.watchlist;
     reviewedIDs = selectedUserData.reviews;
 
-    prevReviewedMovies = reviewedIDs.map((review) => review.imdbID);
-
     useEffect(() => {
+      prevReviewedMovies = reviewedIDs.map((review) => review.imdbID);
       if (likedIDs.hasOwnProperty(props.movieID)) {
         setIsLiked(true);
       }
@@ -116,14 +115,7 @@ const ReviewBox = ({ ...props }) => {
           }
         });
       }
-    }, [
-      props.movieID,
-      likedIDs,
-      watchListIDs,
-      watchedIDs,
-      prevReviewedMovies,
-      reviewedIDs,
-    ]);
+    }, [props.movieID, likedIDs, watchListIDs, watchedIDs, reviewedIDs]);
   }
   let watchText = isWatched ? "Watched" : "Watch";
   let likeText = isLiked ? "Liked" : "Like";
@@ -144,10 +136,6 @@ const ReviewBox = ({ ...props }) => {
   };
 
   const style = { fontSize: "1.5rem" };
-
-  const disableStar = isAlreadyReviewed
-    ? { cursor: "not-allowed", pointerEvents: "none" }
-    : {};
 
   return (
     <ReviewAside>
@@ -180,7 +168,9 @@ const ReviewBox = ({ ...props }) => {
       </ReviewBoxDiv>
       <InputDiv>
         <label>Rating</label>
-        <StarDiv style={disableStar}>
+        <StarDiv
+        // style={disableStar}
+        >
           {[...Array(5)].map((star, index) => {
             const currentRating = index + 1;
             return (
@@ -214,7 +204,6 @@ const ReviewBox = ({ ...props }) => {
         <StyledTextArea
           value={userReview}
           onChange={reviewChangeHandler}
-          disabled={isAlreadyReviewed}
         ></StyledTextArea>
       </InputDiv>
       <BtnDiv>

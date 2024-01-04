@@ -23,7 +23,7 @@ const ReviewDiv = styled.div`
   color: #def;
 `;
 const ReviewRow = styled.div`
-  width: 25%;
+  width: 33%;
   text-align: center;
   flex-wrap: wrap;
 `;
@@ -101,10 +101,6 @@ const Reviews = () => {
                       return rev.review;
                     }
                   })}
-                </ReviewRow>
-
-                <ReviewRow>
-                  <button>Delete</button>
                 </ReviewRow>
               </ReviewDiv>
             );
