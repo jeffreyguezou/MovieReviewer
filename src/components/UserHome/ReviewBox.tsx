@@ -57,7 +57,18 @@ const StyledTextArea = styled.textarea`
   border-radius: 5px;
 `;
 
-const ReviewBox = ({ ...props }) => {
+type ReviewBoxProps = {
+  movieID: string;
+  getUserFeedBack: (
+    isWatched: boolean,
+    isLiked: boolean,
+    isWatchListed: boolean,
+    userReview: string,
+    rating: number
+  ) => void;
+};
+
+const ReviewBox = ({ ...props }: ReviewBoxProps) => {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [isWatched, setIsWatched] = useState(false);
@@ -93,13 +104,13 @@ const ReviewBox = ({ ...props }) => {
 
     useEffect(() => {
       prevReviewedMovies = reviewedIDs.map((review) => review.imdbID);
-      if (likedIDs.hasOwnProperty(props.movieID)) {
+      if (likedIDs[props.movieID]) {
         setIsLiked(true);
       }
-      if (watchListIDs.hasOwnProperty(props.movieID)) {
+      if (watchListIDs[props.movieID]) {
         setIsWatchListed(true);
       }
-      if (watchedIDs.hasOwnProperty(props.movieID)) {
+      if (watchedIDs[props.movieID]) {
         setIsWatched(true);
       }
 
@@ -164,9 +175,7 @@ const ReviewBox = ({ ...props }) => {
       </ReviewBoxDiv>
       <InputDiv>
         <label>Rating</label>
-        <StarDiv
-        // style={disableStar}
-        >
+        <StarDiv>
           {[...Array(5)].map((star, index) => {
             const currentRating = index + 1;
             return (

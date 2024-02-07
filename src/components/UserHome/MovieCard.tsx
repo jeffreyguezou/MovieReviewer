@@ -7,6 +7,8 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { NoMovieMsg } from "./Watched";
 import { review } from "../../util/interfaces";
+import useGetUserIndex from "../../hooks/useGetUserIndex";
+import React from "react";
 
 const ImgCard = styled.div`
   width: 230px;
@@ -41,28 +43,26 @@ const StyledPlot = styled.article`
   padding: 0 20px;
 `;
 
-const MovieCard = ({ ...props }) => {
+type MovieCardProps = {
+  data: { [key: string]: string };
+};
+
+const MovieCard = ({ ...props }: MovieCardProps) => {
   const dispatch = useDispatch();
 
   const { userName } = useSelector((state: AuthState) => state.auth);
   const appData = useSelector((state: AppInterface) => state.app);
+  let uIndex = useGetUserIndex({ uName: userName });
 
-  let userIndex,
-    likedIDs: {},
+  let likedIDs: {},
     watchedIDs: {},
     watchListIDs: {},
     reviewedIDs: review[],
-    prevReviewedMovies: any[];
+    prevReviewedMovies: string[];
   let content;
 
-  appData.users.map((user, index) => {
-    if (user.userName === userName) {
-      userIndex = index;
-    }
-  });
-  if (userIndex) {
-    const selectedUserData = appData.users[userIndex];
-
+  if (uIndex) {
+    const selectedUserData = appData.users[uIndex];
     likedIDs = selectedUserData.movies.liked;
     watchedIDs = selectedUserData.movies.watched;
     watchListIDs = selectedUserData.movies.watchlist;
@@ -77,13 +77,14 @@ const MovieCard = ({ ...props }) => {
     userReview: string,
     rating: number
   ) => {
-    let movieID = props.data.imdbID;
+    let movieID: string = props.data.imdbID;
 
     if (isLiked) {
       if (!likedIDs.hasOwnProperty(movieID)) {
+        console.log(uIndex);
         dispatch(
           AppSliceActions.addLikes({
-            userName,
+            uIndex,
             movieID,
           })
         );
@@ -93,12 +94,12 @@ const MovieCard = ({ ...props }) => {
     //Add to respective state only if not previously existing
     if (isWatchListed) {
       if (!watchListIDs.hasOwnProperty(movieID)) {
-        dispatch(AppSliceActions.addWatchlist({ userName, movieID }));
+        dispatch(AppSliceActions.addWatchlist({ uIndex, movieID }));
       }
     }
     if (isWatched) {
       if (!watchedIDs.hasOwnProperty(movieID)) {
-        dispatch(AppSliceActions.addWatched({ userName, movieID }));
+        dispatch(AppSliceActions.addWatched({ uIndex, movieID }));
       }
     }
     if (rating || userReview) {
@@ -110,7 +111,7 @@ const MovieCard = ({ ...props }) => {
         rating,
       };
       if (!prevReviewedMovies.includes(movieID)) {
-        dispatch(AppSliceActions.addUserReview({ userName, reviewDetails }));
+        dispatch(AppSliceActions.addUserReview({ uIndex, reviewDetails }));
       } else {
         reviewedIDs = reviewedIDs.filter((rev: review) => {
           return rev.imdbID !== movieID;
@@ -118,7 +119,7 @@ const MovieCard = ({ ...props }) => {
         reviewedIDs.push(reviewDetails);
         dispatch(
           AppSliceActions.replaceUserReview({
-            userName,
+            uIndex,
             allUserReviews: reviewedIDs,
           })
         );
@@ -128,17 +129,17 @@ const MovieCard = ({ ...props }) => {
     //Remove only if present in existing array
     if (likedIDs.hasOwnProperty(movieID)) {
       if (!isLiked) {
-        dispatch(AppSliceActions.removeLike({ userName, movieID }));
+        dispatch(AppSliceActions.removeLike({ uIndex, movieID }));
       }
     }
     if (watchedIDs.hasOwnProperty(movieID)) {
       if (!isWatched) {
-        dispatch(AppSliceActions.removeWatched({ userName, movieID }));
+        dispatch(AppSliceActions.removeWatched({ uIndex, movieID }));
       }
     }
     if (watchListIDs.hasOwnProperty(movieID)) {
       if (!isWatchListed) {
-        dispatch(AppSliceActions.removeWatchlist({ userName, movieID }));
+        dispatch(AppSliceActions.removeWatchlist({ uIndex, movieID }));
       }
     }
     toast.success("Done");

@@ -1,18 +1,14 @@
-import UserHome from "../components/UserHome/UserHome";
-import { useNavigate } from "react-router";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
+import { useNavigate } from "react-router";
 import { AuthState } from "../util/interfaces";
-
-const HomePage: React.FC = () => {
-  const navigate = useNavigate();
-
+const useAuthenticate = () => {
+  let navigate = useNavigate();
   let isLoggedIn = useSelector((state: AuthState) => state.auth.isLoggedIn);
   useEffect(() => {
     if (!isLoggedIn) {
       navigate("/signin");
     }
   }, []);
-  return <UserHome />;
 };
-export default HomePage;
+export default useAuthenticate;

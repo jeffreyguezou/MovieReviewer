@@ -1,18 +1,8 @@
 import Watched from "../components/UserHome/Watched";
-import { useNavigate } from "react-router";
-import { useSelector } from "react-redux";
-import { useEffect } from "react";
-import { AuthState } from "../util/interfaces";
+import useAuthenticate from "../hooks/useAuthenticate";
 
-const WatchedPage = () => {
-  const navigate = useNavigate();
-
-  let isLoggedIn = useSelector((state: AuthState) => state.auth.isLoggedIn);
-  useEffect(() => {
-    if (!isLoggedIn) {
-      navigate("/signin");
-    }
-  }, []);
+const WatchedPage: React.FC = () => {
+  useAuthenticate();
   return <Watched />;
 };
 export default WatchedPage;

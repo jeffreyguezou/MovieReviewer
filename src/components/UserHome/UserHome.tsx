@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
 import fetch from "../../API/fetch";
 import MovieCard from "./MovieCard";
-//import { UserMsgP } from "../SignUp/SignUp";
 
 export const BodyDiv = styled.div`
   width: 100%;
@@ -79,6 +78,7 @@ const UserHome = () => {
         <SearchBox onChange={searchTermChangeHandler} type="text"></SearchBox>
         <button onClick={searchHandler}>Search</button>
       </SearchSection>
+      {console.log(data)}
       {data && <MovieCard data={data} />}
     </ContentDiv>
   );

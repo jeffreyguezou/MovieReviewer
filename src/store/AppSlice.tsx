@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+
 const initialState = {
   users: [
     {
@@ -29,111 +30,52 @@ const AppSlice = createSlice({
       state.users.push(action.payload);
     },
     addLikes: (state, action) => {
-      let userIndex;
-      state.users.map((user, index) => {
-        if (user.userName === action.payload.userName) {
-          userIndex = index;
-        }
-      });
-      if (userIndex) {
-        let movieID = action.payload.movieID;
-
-        let updatedLikes = {
-          ...state.users[userIndex].movies.liked,
-          [movieID]: { isLiked: true },
-        };
-        state.users[userIndex].movies.liked = updatedLikes;
-      }
+      let movieID = action.payload.movieID;
+      let updatedLikes = {
+        ...state.users[action.payload.uIndex].movies.liked,
+        [movieID]: { isLiked: true },
+      };
+      state.users[action.payload.uIndex].movies.liked = updatedLikes;
     },
     removeLike: (state, action) => {
-      let userIndex;
-      state.users.map((user, index) => {
-        if (user.userName === action.payload.userName) {
-          userIndex = index;
-        }
-      });
       let movieID = action.payload.movieID;
-      if (userIndex) {
-        delete state.users[userIndex].movies.liked[movieID];
-      }
+      delete state.users[action.payload.uIndex].movies.liked[movieID];
     },
     addWatched: (state, action) => {
-      let userIndex;
-      state.users.map((user, index) => {
-        if (user.userName === action.payload.userName) {
-          userIndex = index;
-        }
-      });
-      if (userIndex) {
-        let movieID = action.payload.movieID;
-        let updatedWatched = {
-          ...state.users[userIndex].movies.watched,
-          [movieID]: { isWatched: true },
-        };
-        state.users[userIndex].movies.watched = updatedWatched;
-      }
+      let movieID = action.payload.movieID;
+      let updatedWatched = {
+        ...state.users[action.payload.uIndex].movies.watched,
+        [movieID]: { isWatched: true },
+      };
+      state.users[action.payload.uIndex].movies.watched = updatedWatched;
     },
     removeWatched: (state, action) => {
-      let userIndex;
-      state.users.map((user, index) => {
-        if (user.userName === action.payload.userName) {
-          userIndex = index;
-        }
-      });
       let movieID = action.payload.movieID;
-
-      delete state.users[userIndex].movies.watched[movieID];
+      delete state.users[action.payload.uIndex].movies.watched[movieID];
     },
 
     addWatchlist: (state, action) => {
-      let userIndex;
-      state.users.map((user, index) => {
-        if (user.userName === action.payload.userName) {
-          userIndex = index;
-        }
-      });
-      if (userIndex) {
-        let movieID = action.payload.movieID;
-        let updatedWatchList = {
-          ...state.users[userIndex].movies.watchlist,
-          [movieID]: { isWatchListed: true },
-        };
-        state.users[userIndex].movies.watchlist = updatedWatchList;
-      }
+      let movieID = action.payload.movieID;
+      let updatedWatchList = {
+        ...state.users[action.payload.uIndex].movies.watchlist,
+        [movieID]: { isWatchListed: true },
+      };
+      state.users[action.payload.uIndex].movies.watchlist = updatedWatchList;
     },
 
     removeWatchlist: (state, action) => {
-      let userIndex;
-      state.users.map((user, index) => {
-        if (user.userName === action.payload.userName) {
-          userIndex = index;
-        }
-      });
       let movieID = action.payload.movieID;
-      delete state.users[userIndex].movies.watched[movieID];
+      delete state.users[action.payload.uIndex].movies.watched[movieID];
     },
 
     addUserReview: (state, action) => {
-      let userIndex;
-      state.users.map((user, index) => {
-        if (user.userName === action.payload.userName) {
-          userIndex = index;
-        }
-      });
-      if (userIndex) {
-        state.users[userIndex].reviews.push(action.payload.reviewDetails);
-      }
+      state.users[action.payload.uIndex].reviews.push(
+        action.payload.reviewDetails
+      );
     },
     replaceUserReview: (state, action) => {
-      let userIndex;
-      state.users.map((user, index) => {
-        if (user.userName === action.payload.userName) {
-          userIndex = index;
-        }
-      });
-      if (userIndex) {
-        state.users[userIndex].reviews = action.payload.allUserReviews;
-      }
+      state.users[action.payload.uIndex].reviews =
+        action.payload.allUserReviews;
     },
   },
 });

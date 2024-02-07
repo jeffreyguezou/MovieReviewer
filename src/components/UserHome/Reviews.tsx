@@ -6,6 +6,7 @@ import { MoviePoster, MovieTitle, MovieCard, NoMovieMsg } from "./Watched";
 import { FaRegStar } from "react-icons/fa";
 import styled from "styled-components";
 import { AppInterface, AuthState, review } from "../../util/interfaces";
+import useGetUserIndex from "../../hooks/useGetUserIndex";
 
 const ContentBodyDiv = styled.div`
   padding: 1rem;
@@ -35,17 +36,12 @@ const AlignedMovieCard = styled(MovieCard)`
 const Reviews = () => {
   const userData = useSelector((state: AppInterface) => state.app.users);
   const { userName } = useSelector((state: AuthState) => state.auth);
-  let userIndex;
   let reviewData: review[];
 
-  userData.map((user, index) => {
-    if (user.userName === userName) {
-      userIndex = index;
-    }
-  });
+  let uIndex = useGetUserIndex({ uName: userName });
 
-  if (userIndex) {
-    reviewData = userData[userIndex].reviews;
+  if (uIndex) {
+    reviewData = userData[uIndex].reviews;
 
     if (reviewData) {
       if (reviewData.length === 0) {

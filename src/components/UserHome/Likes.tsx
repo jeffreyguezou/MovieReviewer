@@ -19,7 +19,7 @@ const WatchListText = styled.span`
 
 //const IDs = ["tt0054215", "tt0068646", "tt1392170"];
 
-const Likes = () => {
+const Likes: React.FC = () => {
   const appData = useSelector((state: AppInterface) => state.app);
   const { userName } = useSelector((state: AuthState) => state.auth);
 
@@ -30,37 +30,40 @@ const Likes = () => {
       userIndex = index;
     }
   });
+  if (userIndex) {
+    const selectedUserData = appData.users[userIndex];
 
-  const selectedUserData = appData.users[userIndex];
+    const IDs = selectedUserData.movies.liked;
+    return (
+      <ContentDiv>
+        <WatchListText>
+          You liked {Object.keys(IDs).length} movies
+        </WatchListText>
+        <Border></Border>
+        <CardContentHolder>
+          {Object.keys(IDs).map((id) => {
+            const { isFetching, data } = useQuery({
+              queryKey: ["movie", id],
+              queryFn: () => {
+                return fetch(`http://www.omdbapi.com/?i=${id}&apikey=3f046e12`);
+              },
+              staleTime: 5000,
+            });
 
-  const IDs = selectedUserData.movies.liked;
-  return (
-    <ContentDiv>
-      <WatchListText>You liked {Object.keys(IDs).length} movies</WatchListText>
-      <Border></Border>
-      <CardContentHolder>
-        {Object.keys(IDs).map((id) => {
-          const { isFetching, data } = useQuery({
-            queryKey: ["movie", id],
-            queryFn: () => {
-              return fetch(`http://www.omdbapi.com/?i=${id}&apikey=3f046e12`);
-            },
-            staleTime: 5000,
-          });
+            if (isFetching) {
+              return <p key={id}>Fetching...</p>;
+            }
 
-          if (isFetching) {
-            return <p key={id}>Fetching...</p>;
-          }
-
-          return (
-            <MovieCard key={id}>
-              {data && <MoviePoster src={data.Poster}></MoviePoster>}
-              {data && <MovieTitle>{data.Title}</MovieTitle>}
-            </MovieCard>
-          );
-        })}
-      </CardContentHolder>
-    </ContentDiv>
-  );
+            return (
+              <MovieCard key={id}>
+                {data && <MoviePoster src={data.Poster}></MoviePoster>}
+                {data && <MovieTitle>{data.Title}</MovieTitle>}
+              </MovieCard>
+            );
+          })}
+        </CardContentHolder>
+      </ContentDiv>
+    );
+  }
 };
 export default Likes;

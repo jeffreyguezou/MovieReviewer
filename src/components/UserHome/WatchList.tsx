@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import fetch from "../../API/fetch";
 import { useSelector } from "react-redux";
 import { AppInterface, AuthState } from "../../util/interfaces";
+import useGetUserIndex from "../../hooks/useGetUserIndex";
 
 const Border = styled.div`
   height: 10px;
@@ -29,51 +30,44 @@ export const LoadingP = styled.p`
   color: #def;
 `;
 
-//const IDs = ["tt0054215", "tt0068646", "tt1392170"];
-
-const WatchList = () => {
+const WatchList: React.FC = () => {
   const appData = useSelector((state: AppInterface) => state.app);
   const { userName } = useSelector((state: AuthState) => state.auth);
 
-  let userIndex;
+  let userIndex = useGetUserIndex({ uName: userName });
 
-  appData.users.map((user, index) => {
-    if (user.userName === userName) {
-      userIndex = index;
-    }
-  });
+  if (userIndex) {
+    const selectedUserData = appData.users[userIndex];
+    const IDs = selectedUserData.movies.watchlist;
+    return (
+      <ContentDiv>
+        <WatchListText>
+          You want to watch {Object.keys(IDs).length} movies
+        </WatchListText>
+        <Border></Border>
+        <CardContentHolder>
+          {Object.keys(IDs).map((id) => {
+            const { isFetching, data } = useQuery({
+              queryKey: ["movie", id],
+              queryFn: () => {
+                return fetch(`http://www.omdbapi.com/?i=${id}&apikey=3f046e12`);
+              },
+              staleTime: 5000,
+            });
+            if (isFetching) {
+              return <LoadingP key={id}>Fetching...</LoadingP>;
+            }
 
-  const selectedUserData = appData.users[userIndex];
-
-  const IDs = selectedUserData.movies.watchlist;
-  return (
-    <ContentDiv>
-      <WatchListText>
-        You want to watch {Object.keys(IDs).length} movies
-      </WatchListText>
-      <Border></Border>
-      <CardContentHolder>
-        {Object.keys(IDs).map((id) => {
-          const { isFetching, data } = useQuery({
-            queryKey: ["movie", id],
-            queryFn: () => {
-              return fetch(`http://www.omdbapi.com/?i=${id}&apikey=3f046e12`);
-            },
-            staleTime: 5000,
-          });
-          if (isFetching) {
-            return <LoadingP key={id}>Fetching...</LoadingP>;
-          }
-
-          return (
-            <MovieCard key={id}>
-              {data && <MoviePoster src={data.Poster}></MoviePoster>}
-              {data && <MovieTitle>{data.Title}</MovieTitle>}
-            </MovieCard>
-          );
-        })}
-      </CardContentHolder>
-    </ContentDiv>
-  );
+            return (
+              <MovieCard key={id}>
+                {data && <MoviePoster src={data.Poster}></MoviePoster>}
+                {data && <MovieTitle>{data.Title}</MovieTitle>}
+              </MovieCard>
+            );
+          })}
+        </CardContentHolder>
+      </ContentDiv>
+    );
+  }
 };
 export default WatchList;

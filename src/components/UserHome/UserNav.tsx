@@ -39,7 +39,7 @@ const UserNavDiv = styled.div`
   padding-top: 7%;
   padding-left: 10%;
 `;
-const UserNav = () => {
+const UserNav: React.FC = () => {
   const navigate = useNavigate();
   const { userName } = useSelector((state: AuthState) => state.auth);
 

@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { useSelector } from "react-redux";
 import { LoadingP } from "./WatchList";
 import { AppInterface, AuthState } from "../../util/interfaces";
+import useGetUserIndex from "../../hooks/useGetUserIndex";
 
 export const MoviePoster = styled.img`
   width: 100px;
@@ -34,17 +35,11 @@ export const NoMovieMsg = styled.p`
   font-size: 2rem;
 `;
 
-const Watched = () => {
+const Watched: React.FC = () => {
   const appData = useSelector((state: AppInterface) => state.app);
   const { userName } = useSelector((state: AuthState) => state.auth);
 
-  let userIndex;
-
-  appData.users.map((user, index) => {
-    if (user.userName === userName) {
-      userIndex = index;
-    }
-  });
+  let userIndex = useGetUserIndex({ uName: userName });
 
   if (userIndex) {
     const selectedUserData = appData.users[userIndex];
